@@ -23,8 +23,10 @@
       }
 
       .site-header {
-        position: sticky;
+        position: fixed;
         top: 0;
+        left: 0;
+        right: 0;
         z-index: 20;
         display: flex;
         align-items: center;
@@ -35,14 +37,14 @@
         transform: translateY(0);
         transition:
           height 180ms ease,
-          transform 180ms ease,
+          transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
           background-color 180ms ease,
           box-shadow 180ms ease,
           backdrop-filter 180ms ease;
       }
 
       .site-header[data-scroll-head-state="hidden"] {
-        transform: translateY(-100%);
+        transform: translate3d(0, -100%, 0);
       }
 
       .site-header[data-scroll-head-edge="away"] {
@@ -71,7 +73,7 @@
         min-height: 58vh;
         display: grid;
         align-content: center;
-        padding: 32px clamp(20px, 5vw, 56px) 64px;
+        padding: 168px clamp(20px, 5vw, 56px) 64px;
         background:
           linear-gradient(120deg, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.1)),
           linear-gradient(135deg, #f6d365, #8fd3f4 48%, #fda085);
@@ -166,12 +168,13 @@
 
       createScrollHead(document.querySelector(".site-header"), {
         behaviors: ["hide", "compact", "elevate"],
-        threshold: 96,
-        hideDelta: 18,
-        revealDelta: 8,
+        compactAt: 96,
+        hideAfter: 320,
+        hideDistance: 24,
+        revealDistance: 8,
         heights: {
-          full: 72,
-          compact: 54
+          full: 104,
+          compact: 70
         }
       });
     </script>

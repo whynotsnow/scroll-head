@@ -45,10 +45,10 @@ body {
 }
 
 .hero {
-  min-height: 66vh;
+  min-height: 72vh;
   display: grid;
   align-content: center;
-  padding: 40px clamp(20px, 5vw, 56px) 72px;
+  padding: 168px clamp(20px, 5vw, 56px) 72px;
   background:
     linear-gradient(115deg, rgb(255 255 255 / 0.86), rgb(255 255 255 / 0.22)),
     linear-gradient(140deg, #f4d35e, #5bc0be 46%, #ee964b);
@@ -79,7 +79,7 @@ body {
 
 .status-panel {
   position: sticky;
-  top: calc(var(--scroll-head-height, 56px) + 16px);
+  top: 88px;
   z-index: 5;
   display: flex;
   flex-wrap: wrap;

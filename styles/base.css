@@ -1,9 +1,9 @@
 .scroll-head {
-  --scroll-head-transition-duration: 180ms;
-  --scroll-head-transition-easing: ease;
+  --scroll-head-transition-duration: 220ms;
+  --scroll-head-transition-easing: cubic-bezier(0.22, 1, 0.36, 1);
 
   height: var(--scroll-head-height, 72px);
-  transform: translateY(0);
+  transform: translate3d(0, 0, 0);
   transition:
     height var(--scroll-head-transition-duration) var(--scroll-head-transition-easing),
     transform var(--scroll-head-transition-duration) var(--scroll-head-transition-easing),
@@ -16,7 +16,7 @@
 
 .scroll-head[data-scroll-head-state="hidden"],
 .scroll-head.scroll-head--hidden {
-  transform: translateY(-100%);
+  transform: translate3d(0, -100%, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {

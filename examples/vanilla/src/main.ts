@@ -14,12 +14,13 @@ if (header) {
   createScrollHead(header, {
     behaviors: ["hide", "compact", "elevate"],
     classes: true,
-    threshold: 96,
-    hideDelta: 18,
-    revealDelta: 8,
+    compactAt: 128,
+    hideAfter: 360,
+    hideDistance: 24,
+    revealDistance: 8,
     heights: {
-      full: 76,
-      compact: 56
+      full: 112,
+      compact: 72
     },
     onChange({ state, changed }) {
       if (changed.visibility && status.state) status.state.textContent = state.visibility;
