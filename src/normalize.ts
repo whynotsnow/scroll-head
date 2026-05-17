@@ -1,7 +1,17 @@
-import { DEFAULT_BEHAVIORS, DEFAULT_CLASSES, DEFAULT_HEIGHTS, DEFAULT_OPTIONS } from "./defaults.js";
+import {
+  DEFAULT_CLASSES,
+  DEFAULT_HEIGHTS,
+  DEFAULT_OPTIONS,
+  MODE_BEHAVIORS
+} from "./defaults.js";
 import { getHeightDelta } from "./heights.js";
-import { normalizeDistance, normalizeHideAfter, normalizeProgressRange } from "./math.js";
-import type { NormalizedOptions, ScrollHeadClasses, ScrollHeadOptions } from "./types.js";
+import { normalizeDistance, normalizeHideAfter } from "./math.js";
+import type {
+  NormalizedOptions,
+  ScrollHeadClasses,
+  ScrollHeadOptions,
+  ScrollHeadOutput
+} from "./types.js";
 
 export function normalizeOptions(options: ScrollHeadOptions): NormalizedOptions {
   const root = options.root ?? window;
@@ -10,46 +20,47 @@ export function normalizeOptions(options: ScrollHeadOptions): NormalizedOptions 
     compact: options.heights?.compact ?? DEFAULT_HEIGHTS.compact
   };
   const heightDelta = getHeightDelta(heights);
-  const topThreshold = normalizeDistance(options.topThreshold, DEFAULT_OPTIONS.topThreshold);
-  const compactAt = normalizeDistance(
-    options.compactAt ?? options.threshold,
-    DEFAULT_OPTIONS.compactAt
-  );
-  const hideAfter = normalizeHideAfter(options.hideAfter ?? options.hideThreshold, compactAt);
+  const topThreshold = normalizeDistance(options.top, DEFAULT_OPTIONS.topThreshold);
+  const at = normalizeDistance(options.at, DEFAULT_OPTIONS.compactAt);
+  const compactAt = normalizeDistance(options.on?.pass?.y, at);
+  const hysteresis = normalizeDistance(options.hysteresis, heightDelta + 8);
   const restoreCompactAt = normalizeDistance(
-    options.restoreCompactAt ?? options.compactReleaseThreshold,
-    Math.max(topThreshold, compactAt - heightDelta - 8)
+    options.on?.returnBefore?.y,
+    Math.max(topThreshold, compactAt - hysteresis)
   );
 
   return {
-    behaviors: new Set(options.behaviors ?? DEFAULT_BEHAVIORS),
+    behaviors: new Set(MODE_BEHAVIORS[options.mode ?? "auto"]),
     compactAt,
-    hideAfter,
+    hideAfter: normalizeHideAfter(options.on?.scrollDown?.after, compactAt),
     restoreCompactAt: Math.min(restoreCompactAt, compactAt),
     topThreshold,
     hideDistance: normalizeDistance(
-      options.hideDistance ?? options.hideDelta,
+      options.on?.scrollDown?.distance,
       DEFAULT_OPTIONS.hideDistance
     ),
     revealDistance: normalizeDistance(
-      options.revealDistance ?? options.revealDelta,
+      options.on?.scrollUp?.distance,
       DEFAULT_OPTIONS.revealDistance
     ),
-    progressRange: normalizeProgressRange(options.progressRange, [0, compactAt]),
+    progressRange: [
+      normalizeDistance(options.on?.progress?.from, 0),
+      normalizeDistance(options.on?.progress?.to, compactAt)
+    ],
     heights,
     root,
-    attributePrefix: options.attributePrefix ?? DEFAULT_OPTIONS.attributePrefix,
-    cssVarPrefix: options.cssVarPrefix ?? DEFAULT_OPTIONS.cssVarPrefix,
-    attributes: options.attributes ?? true,
-    cssVars: options.cssVars ?? true,
-    classes: normalizeClasses(options.classes),
+    attributePrefix: options.output?.attributePrefix ?? DEFAULT_OPTIONS.attributePrefix,
+    cssVarPrefix: options.output?.cssVarPrefix ?? DEFAULT_OPTIONS.cssVarPrefix,
+    attributes: options.output?.attributes ?? true,
+    cssVars: options.output?.cssVars ?? true,
+    classes: normalizeClasses(options.output?.classes),
     disabled: options.disabled ?? false,
     onChange: options.onChange
   };
 }
 
 function normalizeClasses(
-  classes: ScrollHeadOptions["classes"]
+  classes: ScrollHeadOutput["classes"]
 ): Required<ScrollHeadClasses> | null {
   if (!classes) return null;
   if (classes === true) return DEFAULT_CLASSES;

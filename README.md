@@ -30,11 +30,17 @@ const header = document.querySelector<HTMLElement>(".site-header");
 
 if (header) {
   createScrollHead(header, {
-    behaviors: ["hide", "compact", "elevate"],
-    compactAt: 96,
-    hideAfter: 320,
-    hideDistance: 24,
-    revealDistance: 8,
+    mode: "hide-compact",
+    at: 96,
+    on: {
+      scrollDown: {
+        after: 320,
+        distance: 24
+      },
+      scrollUp: {
+        distance: 8
+      }
+    },
     heights: {
       full: 104,
       compact: 70
@@ -92,7 +98,9 @@ import { createScrollHead } from "scroll-head";
 import "scroll-head/styles/presets/blog.css";
 
 createScrollHead(document.querySelector(".site-header")!, {
-  classes: true
+  output: {
+    classes: true
+  }
 });
 ```
 
@@ -108,15 +116,22 @@ The preset is intentionally small. It uses a fixed overlay header for stable hei
 import "scroll-head/styles/base.css";
 ```
 
-## Scroll Phases
+## Scroll Modes
 
-The main scroll options describe phases instead of raw implementation details:
+The main scroll options describe intent first. `mode` chooses the built-in behavior,
+`at` sets the primary scroll position, and `on` can override individual trigger
+values when you need finer control.
 
 ```ts
 createScrollHead(header, {
-  compactAt: 128,
-  hideAfter: 360,
-  restoreCompactAt: 80,
+  mode: "hide-compact",
+  at: 128,
+  hysteresis: 48,
+  on: {
+    scrollDown: {
+      after: 360
+    }
+  },
   heights: {
     full: 112,
     compact: 72
@@ -131,7 +146,16 @@ This creates:
 - auto-hide behavior after `360px`
 - full header again when scrolling back to `80px`
 
-`hideAfter: false` disables automatic hiding while keeping compact and elevate behavior.
+Available modes:
+
+- `auto` and `hide-compact`: hide, compact, and elevate
+- `hide`: hide and elevate
+- `compact`: compact and elevate
+- `elevate`: expose top/away edge state only
+- `none`: disable built-in behavior state changes
+
+`mode: "compact"` keeps compact and elevate behavior without automatic hiding.
+`on.scrollDown.after: false` disables automatic hiding while keeping the selected mode.
 
 ## Option Boundaries
 
@@ -139,17 +163,9 @@ Numeric scroll distances are normalized:
 
 - negative numbers become `0`
 - `NaN`, `Infinity`, and `-Infinity` fall back to defaults
-- very large finite values are allowed, so `hideAfter: 100000` effectively delays hiding until that scroll position
-- `hideAfter: false` is the explicit way to never hide
-- `restoreCompactAt` is clamped so it cannot be greater than `compactAt`
-
-Deprecated names are still accepted for compatibility:
-
-- `threshold` -> `compactAt`
-- `hideThreshold` -> `hideAfter`
-- `compactReleaseThreshold` -> `restoreCompactAt`
-- `hideDelta` -> `hideDistance`
-- `revealDelta` -> `revealDistance`
+- very large finite values are allowed, so `on.scrollDown.after: 100000` effectively delays hiding until that scroll position
+- `on.scrollDown.after: false` is the explicit way to never hide
+- `on.returnBefore.y` is clamped so it cannot be greater than the compact trigger
 
 ## Optional Classes
 
@@ -157,7 +173,9 @@ Attributes are the default styling contract. If you prefer class-based CSS, enab
 
 ```ts
 createScrollHead(header, {
-  classes: true
+  output: {
+    classes: true
+  }
 });
 ```
 
@@ -180,11 +198,13 @@ You can customize class names:
 
 ```ts
 createScrollHead(header, {
-  classes: {
-    root: "site-head",
-    hidden: "is-hidden",
-    compact: "is-compact",
-    away: "is-elevated"
+  output: {
+    classes: {
+      root: "site-head",
+      hidden: "is-hidden",
+      compact: "is-compact",
+      away: "is-elevated"
+    }
   }
 });
 ```
@@ -235,37 +255,43 @@ controller.destroy();
 
 ```ts
 interface ScrollHeadOptions {
-  behaviors?: Array<"hide" | "compact" | "elevate">;
-  compactAt?: number;
-  hideAfter?: number | false;
-  restoreCompactAt?: number;
-  hideDistance?: number;
-  revealDistance?: number;
-  topThreshold?: number;
-  progressRange?: [start: number, end: number];
+  mode?: "auto" | "hide" | "compact" | "elevate" | "hide-compact" | "none";
+  at?: number;
+  top?: number;
+  hysteresis?: number;
+  on?: {
+    scrollDown?: {
+      after?: number | false;
+      distance?: number;
+    };
+    scrollUp?: {
+      distance?: number;
+    };
+    pass?: {
+      y?: number;
+    };
+    returnBefore?: {
+      y?: number;
+    };
+    progress?: {
+      from?: number;
+      to?: number;
+    };
+  };
+  output?: {
+    attributePrefix?: string;
+    cssVarPrefix?: string;
+    attributes?: boolean;
+    cssVars?: boolean;
+    classes?: boolean | ScrollHeadClasses;
+  };
   heights?: {
     full?: number | string;
     compact?: number | string;
   };
   root?: Window | HTMLElement;
-  attributePrefix?: string;
-  cssVarPrefix?: string;
-  attributes?: boolean;
-  cssVars?: boolean;
-  classes?: boolean | ScrollHeadClasses;
   disabled?: boolean;
   onChange?: (event: ScrollHeadChangeEvent) => void;
-
-  /** @deprecated Use compactAt. */
-  threshold?: number;
-  /** @deprecated Use hideAfter. */
-  hideThreshold?: number;
-  /** @deprecated Use restoreCompactAt. */
-  compactReleaseThreshold?: number;
-  /** @deprecated Use hideDistance. */
-  hideDelta?: number;
-  /** @deprecated Use revealDistance. */
-  revealDelta?: number;
 }
 ```
 

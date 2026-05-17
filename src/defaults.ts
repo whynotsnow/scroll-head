@@ -1,4 +1,9 @@
-import type { ScrollHeadBehavior, ScrollHeadClasses, ScrollHeadHeights } from "./types.js";
+import type {
+  ScrollHeadBehavior,
+  ScrollHeadClasses,
+  ScrollHeadHeights,
+  ScrollHeadMode
+} from "./types.js";
 
 export const DEFAULT_OPTIONS = {
   compactAt: 80,
@@ -15,6 +20,15 @@ export const DEFAULT_HEIGHTS: Required<ScrollHeadHeights> = {
 };
 
 export const DEFAULT_BEHAVIORS: ScrollHeadBehavior[] = ["hide", "compact", "elevate"];
+
+export const MODE_BEHAVIORS: Record<ScrollHeadMode, ScrollHeadBehavior[]> = {
+  auto: DEFAULT_BEHAVIORS,
+  hide: ["hide", "elevate"],
+  compact: ["compact", "elevate"],
+  elevate: ["elevate"],
+  "hide-compact": DEFAULT_BEHAVIORS,
+  none: []
+};
 
 export const DEFAULT_CLASSES: Required<ScrollHeadClasses> = {
   root: "scroll-head",

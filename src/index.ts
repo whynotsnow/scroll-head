@@ -22,15 +22,17 @@ import {
 import type { ScrollHeadController, ScrollHeadOptions } from "./types.js";
 
 export type {
-  ScrollHeadBehavior,
   ScrollHeadChanged,
   ScrollHeadChangeEvent,
   ScrollHeadClasses,
   ScrollHeadController,
   ScrollHeadDirection,
   ScrollHeadEdge,
+  ScrollHeadEventOverrides,
   ScrollHeadHeights,
+  ScrollHeadMode,
   ScrollHeadOptions,
+  ScrollHeadOutput,
   ScrollHeadSize,
   ScrollHeadState,
   ScrollHeadVisibility

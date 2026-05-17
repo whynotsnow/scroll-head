@@ -1,5 +1,7 @@
 export type ScrollHeadBehavior = "hide" | "compact" | "elevate";
 
+export type ScrollHeadMode = "auto" | "hide" | "compact" | "elevate" | "hide-compact" | "none";
+
 export type ScrollHeadDirection = "up" | "down" | "idle";
 
 export type ScrollHeadVisibility = "visible" | "hidden";
@@ -53,70 +55,27 @@ export interface ScrollHeadClasses {
   directionIdle?: string;
 }
 
-export interface ScrollHeadOptions {
-  /**
-   * Behaviors controlled by the library. Visual transitions remain in CSS.
-   *
-   * hide: hide when scrolling down and reveal when scrolling up.
-   * compact: switch from full to compact size after threshold.
-   * elevate: expose top/away edge state for background/shadow styling.
-   */
-  behaviors?: ScrollHeadBehavior[];
-  /**
-   * Scroll position where full height changes to compact height.
-   */
-  compactAt?: number;
-  /**
-   * Scroll position where hide-on-scroll-down can begin.
-   *
-   * false disables automatic hiding while keeping compact/elevate behavior.
-   */
-  hideAfter?: number | false;
-  /**
-   * Scroll position where compact height returns to full height.
-   */
-  restoreCompactAt?: number;
-  /**
-   * Downward distance required before hiding.
-   */
-  hideDistance?: number;
-  /**
-   * Upward distance required before revealing.
-   */
-  revealDistance?: number;
-  /**
-   * @deprecated Use compactAt.
-   */
-  threshold?: number;
-  /**
-   * @deprecated Use hideAfter.
-   */
-  hideThreshold?: number;
-  /**
-   * @deprecated Use restoreCompactAt.
-   */
-  compactReleaseThreshold?: number;
-  /**
-   * Position treated as the page top. Useful when the page has a tiny offset.
-   */
-  topThreshold?: number;
-  /**
-   * @deprecated Use hideDistance.
-   */
-  hideDelta?: number;
-  /**
-   * @deprecated Use revealDistance.
-   */
-  revealDelta?: number;
-  /**
-   * Range used to calculate --scroll-head-progress.
-   */
-  progressRange?: [start: number, end: number];
-  heights?: ScrollHeadHeights;
-  /**
-   * Window or scrollable element. Defaults to window.
-   */
-  root?: Window | HTMLElement;
+export interface ScrollHeadEventOverrides {
+  scrollDown?: {
+    after?: number | false;
+    distance?: number;
+  };
+  scrollUp?: {
+    distance?: number;
+  };
+  pass?: {
+    y?: number;
+  };
+  returnBefore?: {
+    y?: number;
+  };
+  progress?: {
+    from?: number;
+    to?: number;
+  };
+}
+
+export interface ScrollHeadOutput {
   /**
    * data attribute prefix. Defaults to "data-scroll-head".
    */
@@ -128,6 +87,42 @@ export interface ScrollHeadOptions {
   attributes?: boolean;
   cssVars?: boolean;
   classes?: boolean | ScrollHeadClasses;
+}
+
+export interface ScrollHeadOptions {
+  /**
+   * Preset behavior mode. Use `on` to override the derived scroll triggers.
+   *
+   * auto/hide-compact: hide, compact, and elevate.
+   * hide: hide and elevate.
+   * compact: compact and elevate.
+   * elevate: expose top/away edge state only.
+   * none: disable built-in behavior state changes.
+   */
+  mode?: ScrollHeadMode;
+  /**
+   * Main scroll position used to derive compact and hide triggers.
+   */
+  at?: number;
+  /**
+   * Position treated as the page top. Useful when the page has a tiny offset.
+   */
+  top?: number;
+  /**
+   * Distance before returning from compact to full size.
+   */
+  hysteresis?: number;
+  /**
+   * Semantic trigger overrides. These are normalized into the same internal
+   * threshold model used by the scroll state machine.
+   */
+  on?: ScrollHeadEventOverrides;
+  output?: ScrollHeadOutput;
+  heights?: ScrollHeadHeights;
+  /**
+   * Window or scrollable element. Defaults to window.
+   */
+  root?: Window | HTMLElement;
   disabled?: boolean;
   onChange?: (event: ScrollHeadChangeEvent) => void;
 }
