@@ -1,10 +1,21 @@
 {
-  "name": "scroll-head",
+  "name": "@whynotsnow/scroll-head",
   "version": "0.1.0",
   "description": "Headless scroll-aware header controller for content sites.",
   "type": "module",
   "license": "MIT",
-  "author": "",
+  "author": "whynotsnow",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:whynotsnow/scroll-head.git"
+  },
+  "bugs": {
+    "url": "https://github.com/whynotsnow/scroll-head/issues"
+  },
+  "homepage": "https://github.com/whynotsnow/scroll-head#readme",
+  "publishConfig": {
+    "access": "public"
+  },
   "keywords": [
     "sticky",
     "header",
@@ -16,8 +27,12 @@
   "sideEffects": [
     "**/*.css"
   ],
+  "engines": {
+    "node": ">=18"
+  },
   "files": [
     "dist",
+    "src",
     "styles",
     "README.md",
     "LICENSE"
@@ -39,7 +54,10 @@
   "scripts": {
     "dev": "vite examples/vanilla",
     "build": "tsc -p tsconfig.build.json",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run typecheck && npm test"
   },
   "devDependencies": {
     "typescript": "^5.8.0",

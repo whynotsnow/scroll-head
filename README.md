@@ -1,35 +1,26 @@
-# scroll-head
+# @whynotsnow/scroll-head
 
-Headless scroll-aware header controller for blogs, docs, and simple product sites.
+面向博客、文档站和内容型页面的无头滚动头部控制器。
 
-`scroll-head` does not render a header. The core watches scroll state and writes a small DOM contract to your header: `data-*` attributes, CSS variables, and optional classes. Your CSS owns the visual design and transitions.
+`scroll-head` 不渲染 header，也不绑定任何框架。它只监听滚动状态，并把一组稳定的 DOM 契约写到你的 header 上：`data-*` 属性、CSS 变量，以及可选 class。视觉样式、布局和动画都由你的 CSS 控制。
 
-## Install
-
-```bash
-npm install scroll-head
-```
-
-## Development
+## 安装
 
 ```bash
-npm install
-npm run dev
+npm install @whynotsnow/scroll-head
 ```
 
-The dev server runs a vanilla demo from `examples/vanilla`.
+这个包是 ESM-only，适合现代打包器、Vite、Rollup、Webpack、Next.js / Nuxt / Astro 等客户端入口使用。因为核心默认会访问 `window`，如果在 SSR 环境中使用，请只在浏览器端初始化，或显式传入浏览器端可用的 `root`。
 
-## Headless Core
-
-Use the core when you want full control over markup and styles.
+## 快速开始
 
 ```ts
-import { createScrollHead } from "scroll-head";
+import { createScrollHead } from "@whynotsnow/scroll-head";
 
 const header = document.querySelector<HTMLElement>(".site-header");
 
 if (header) {
-  createScrollHead(header, {
+  const controller = createScrollHead(header, {
     mode: "hide-compact",
     at: 96,
     on: {
@@ -46,10 +37,13 @@ if (header) {
       compact: 70
     }
   });
+
+  // 在页面卸载或组件销毁时调用。
+  // controller.destroy();
 }
 ```
 
-By default the controller writes:
+默认情况下，控制器会写入类似这样的状态：
 
 ```html
 <header
@@ -62,7 +56,7 @@ By default the controller writes:
 </header>
 ```
 
-You can style directly against attributes and variables:
+然后你可以直接用属性和 CSS 变量写样式：
 
 ```css
 .site-header {
@@ -89,13 +83,13 @@ You can style directly against attributes and variables:
 }
 ```
 
-## Quick Preset Styles
+## 预设样式
 
-For a faster start, add the base class and import the blog preset:
+如果想更快启动，可以导入内置 CSS：
 
 ```ts
-import { createScrollHead } from "scroll-head";
-import "scroll-head/styles/presets/blog.css";
+import { createScrollHead } from "@whynotsnow/scroll-head";
+import "@whynotsnow/scroll-head/styles/presets/blog.css";
 
 createScrollHead(document.querySelector(".site-header")!, {
   output: {
@@ -110,17 +104,17 @@ createScrollHead(document.querySelector(".site-header")!, {
 </header>
 ```
 
-The preset is intentionally small. It uses a fixed overlay header for stable height transitions, and covers height/transform transitions, top versus away background, and reduced-motion behavior. You can also import only the base transition layer:
+也可以只导入基础过渡层：
 
 ```ts
-import "scroll-head/styles/base.css";
+import "@whynotsnow/scroll-head/styles/base.css";
 ```
 
-## Scroll Modes
+内置 CSS 很克制，只处理高度、隐藏、顶部/离顶状态、背景过渡和 reduced-motion。更具体的导航、品牌、菜单、响应式布局仍然交给你的项目样式。
 
-The main scroll options describe intent first. `mode` chooses the built-in behavior,
-`at` sets the primary scroll position, and `on` can override individual trigger
-values when you need finer control.
+## 滚动模式
+
+`mode` 描述内置行为，`at` 是主要滚动触发点，`on` 可以覆盖具体阈值。
 
 ```ts
 createScrollHead(header, {
@@ -139,37 +133,40 @@ createScrollHead(header, {
 });
 ```
 
-This creates:
+上面的配置表示：
 
-- full header from the top to `128px`
-- compact pinned header from `128px` to `360px`
-- auto-hide behavior after `360px`
-- full header again when scrolling back to `80px`
+- `0px` 到 `128px` 使用完整 header
+- `128px` 到 `360px` 使用紧凑 header
+- 超过 `360px` 后，继续向下滚动会自动隐藏
+- 回滚到 `80px` 前恢复完整 header
 
-Available modes:
+可用模式：
 
-- `auto` and `hide-compact`: hide, compact, and elevate
-- `hide`: hide and elevate
-- `compact`: compact and elevate
-- `elevate`: expose top/away edge state only
-- `none`: disable built-in behavior state changes
+- `auto` / `hide-compact`：隐藏、紧凑、离顶高亮
+- `hide`：隐藏、离顶高亮
+- `compact`：紧凑、离顶高亮
+- `elevate`：只输出顶部/离顶状态
+- `none`：关闭内置行为状态变化
 
-`mode: "compact"` keeps compact and elevate behavior without automatic hiding.
-`on.scrollDown.after: false` disables automatic hiding while keeping the selected mode.
+如果只想保留紧凑和离顶效果，不想自动隐藏，可以用 `mode: "compact"`。如果想使用 `hide-compact` 但禁用隐藏阈值，可以设置 `on.scrollDown.after: false`。
 
-## Option Boundaries
+## 输出契约
 
-Numeric scroll distances are normalized:
+默认输出属性：
 
-- negative numbers become `0`
-- `NaN`, `Infinity`, and `-Infinity` fall back to defaults
-- very large finite values are allowed, so `on.scrollDown.after: 100000` effectively delays hiding until that scroll position
-- `on.scrollDown.after: false` is the explicit way to never hide
-- `on.returnBefore.y` is clamped so it cannot be greater than the compact trigger
+- `data-scroll-head-state`: `visible` / `hidden`
+- `data-scroll-head-size`: `full` / `compact`
+- `data-scroll-head-edge`: `top` / `away`
+- `data-scroll-direction`: `idle` / `down` / `up`
 
-## Optional Classes
+默认输出 CSS 变量：
 
-Attributes are the default styling contract. If you prefer class-based CSS, enable class syncing:
+- `--scroll-head-y`
+- `--scroll-head-progress`
+- `--scroll-head-height`
+- `--scroll-head-visible`
+
+如果更偏好 class，可以打开 class 同步：
 
 ```ts
 createScrollHead(header, {
@@ -179,7 +176,7 @@ createScrollHead(header, {
 });
 ```
 
-Default classes:
+默认 class：
 
 ```html
 <header
@@ -194,7 +191,7 @@ Default classes:
 </header>
 ```
 
-You can customize class names:
+也可以自定义 class 名：
 
 ```ts
 createScrollHead(header, {
@@ -209,9 +206,19 @@ createScrollHead(header, {
 });
 ```
 
+## 边界规则
+
+滚动距离会被规范化：
+
+- 负数会变成 `0`
+- `NaN`、`Infinity`、`-Infinity` 会回退到默认值
+- 很大的有限数字会被保留，所以 `on.scrollDown.after: 100000` 可以用来推迟隐藏
+- `on.scrollDown.after: false` 是明确禁用隐藏的方式
+- `on.returnBefore.y` 会被限制在不大于紧凑触发点
+
 ## Change Events
 
-`onChange` receives the current state, previous state, changed fields, and the controlled element.
+`onChange` 会收到当前状态、上一次状态、变更字段和被控制的元素。
 
 ```ts
 createScrollHead(header, {
@@ -225,7 +232,7 @@ createScrollHead(header, {
 });
 ```
 
-The `changed` object contains:
+`changed` 的结构：
 
 ```ts
 {
@@ -251,7 +258,9 @@ controller.enable();
 controller.destroy();
 ```
 
-### Options
+`destroy()` 会移除滚动和 resize 监听，并恢复初始化前由 `scroll-head` 管理的属性、CSS 变量和 class 状态。
+
+## Options
 
 ```ts
 interface ScrollHeadOptions {
@@ -295,6 +304,82 @@ interface ScrollHeadOptions {
 }
 ```
 
-## Design Notes
+## 调试与 source map
 
-The first version uses a small scroll state machine with `requestAnimationFrame`. That keeps direction-aware behavior reliable while leaving animation work to CSS transitions. Framework adapters can build on this core without changing the DOM contract.
+npm 包会同时发布 `dist` 和 `src`。`dist/*.js.map` 指向 `../src/*.ts`，所以在支持 source map 的调试器里可以回到 TypeScript 源文件。
+
+## 本地开发
+
+```bash
+npm install
+npm run dev
+```
+
+示例项目位于 `examples/vanilla`。
+
+常用检查：
+
+```bash
+npm run typecheck
+npm test
+npm pack --dry-run
+```
+
+## English
+
+`@whynotsnow/scroll-head` is a headless scroll-aware header controller for blogs, docs, and content-heavy sites.
+
+It does not render a header. Instead, it observes scroll state and writes a small DOM contract to your header element: `data-*` attributes, CSS variables, and optional classes. Your CSS owns the layout, visuals, and transitions.
+
+### Install
+
+```bash
+npm install @whynotsnow/scroll-head
+```
+
+The package is ESM-only. In SSR environments, initialize it only on the client, or pass a browser-side `root`.
+
+### Basic Usage
+
+```ts
+import { createScrollHead } from "@whynotsnow/scroll-head";
+
+const header = document.querySelector<HTMLElement>(".site-header");
+
+if (header) {
+  createScrollHead(header, {
+    mode: "hide-compact",
+    at: 96,
+    heights: {
+      full: 104,
+      compact: 70
+    }
+  });
+}
+```
+
+### Preset CSS
+
+```ts
+import "@whynotsnow/scroll-head/styles/presets/blog.css";
+```
+
+Or import only the base transition layer:
+
+```ts
+import "@whynotsnow/scroll-head/styles/base.css";
+```
+
+### API
+
+```ts
+const controller = createScrollHead(element, options);
+
+controller.getState();
+controller.update();
+controller.disable();
+controller.enable();
+controller.destroy();
+```
+
+`destroy()` removes listeners and restores the attributes, CSS variables, and classes managed by `scroll-head`.
