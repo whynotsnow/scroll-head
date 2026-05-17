@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>scroll-head vanilla demo</title>
+    <script type="module" src="/src/main.ts"></script>
+  </head>
+  <body>
+    <header class="site-header scroll-head scroll-head-blog">
+      <a class="brand" href="/">scroll-head</a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#intro">Intro</a>
+        <a href="#motion">Motion</a>
+        <a href="#events">Events</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" id="intro">
+        <p class="eyebrow">Vanilla demo</p>
+        <h1>Headless scroll behavior with smooth CSS transitions.</h1>
+        <p>
+          Scroll down to hide and compact the header. Scroll up to reveal it.
+          The core writes state; CSS owns the motion.
+        </p>
+      </section>
+
+      <section class="status-panel" aria-live="polite">
+        <span>state <strong data-status="state">visible</strong></span>
+        <span>size <strong data-status="size">full</strong></span>
+        <span>edge <strong data-status="edge">top</strong></span>
+        <span>direction <strong data-status="direction">idle</strong></span>
+      </section>
+
+      <article>
+        <h2 id="motion">Motion belongs to CSS</h2>
+        <p>
+          The library updates attributes, variables, and optional classes. The
+          demo imports the blog preset, then adds local layout styles for the
+          page.
+        </p>
+        <p>
+          The compact height is driven by <code>--scroll-head-height</code>.
+          Visibility is controlled by the state attribute or the synced class.
+        </p>
+
+        <h2 id="events">State changes are observable</h2>
+        <p>
+          The panel above is updated through <code>onChange</code>. The callback
+          receives the current state, the previous state, and a map of fields
+          that changed.
+        </p>
+        <p>
+          This makes it easy to connect the controller to analytics, custom
+          classes, or framework state without making the package render any UI.
+        </p>
+
+        <h2>Enough content to scroll</h2>
+        <p>
+          Blog and product pages tend to need a small, predictable contract:
+          top versus away, full versus compact, visible versus hidden. That is
+          the shape this first version optimizes for.
+        </p>
+        <p>
+          Future framework adapters can reuse the same controller and keep their
+          own lifecycle code thin.
+        </p>
+      </article>
+    </main>
+  </body>
+</html>

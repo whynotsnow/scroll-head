@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>scroll-head demo</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        color: #172026;
+        background: #f7f4ef;
+      }
+
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: var(--scroll-head-height, 72px);
+        padding: 0 clamp(20px, 5vw, 56px);
+        background: transparent;
+        transform: translateY(0);
+        transition:
+          height 180ms ease,
+          transform 180ms ease,
+          background-color 180ms ease,
+          box-shadow 180ms ease,
+          backdrop-filter 180ms ease;
+      }
+
+      .site-header[data-scroll-head-state="hidden"] {
+        transform: translateY(-100%);
+      }
+
+      .site-header[data-scroll-head-edge="away"] {
+        background: rgb(255 255 255 / 0.82);
+        box-shadow: 0 1px 0 rgb(23 32 38 / 0.1);
+        backdrop-filter: blur(14px);
+      }
+
+      .brand {
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .nav {
+        display: flex;
+        gap: 18px;
+        font-size: 14px;
+      }
+
+      .nav a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .hero {
+        min-height: 58vh;
+        display: grid;
+        align-content: center;
+        padding: 32px clamp(20px, 5vw, 56px) 64px;
+        background:
+          linear-gradient(120deg, rgb(255 255 255 / 0.78), rgb(255 255 255 / 0.1)),
+          linear-gradient(135deg, #f6d365, #8fd3f4 48%, #fda085);
+      }
+
+      .hero h1 {
+        max-width: 760px;
+        margin: 0;
+        font-size: clamp(44px, 8vw, 96px);
+        line-height: 0.94;
+        letter-spacing: 0;
+      }
+
+      .hero p,
+      article {
+        max-width: 720px;
+      }
+
+      .hero p {
+        margin: 24px 0 0;
+        font-size: 20px;
+        line-height: 1.6;
+      }
+
+      article {
+        margin: 0 auto;
+        padding: 72px 20px 40vh;
+        font-size: 18px;
+        line-height: 1.8;
+      }
+
+      article h2 {
+        margin-top: 56px;
+        font-size: 30px;
+        line-height: 1.2;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="brand">scroll-head</div>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#story">Story</a>
+        <a href="#design">Design</a>
+        <a href="#notes">Notes</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1>Headless header behavior for calm content sites.</h1>
+        <p>
+          Scroll down to hide and compact the header. Scroll up to reveal it.
+          The transition is pure CSS, driven by attributes and variables.
+        </p>
+      </section>
+
+      <article>
+        <h2 id="story">Story</h2>
+        <p>
+          This demo keeps the JavaScript deliberately small. The controller
+          only tracks scroll position, direction, visibility, and size. The
+          header's appearance stays in CSS.
+        </p>
+        <p>
+          That makes the library suitable for blogs, docs, and product pages
+          where teams usually want their own markup and design system.
+        </p>
+
+        <h2 id="design">Design</h2>
+        <p>
+          The header switches from a full height to a compact height after the
+          threshold. It also exposes a top or away edge state so CSS can move
+          from transparent to elevated.
+        </p>
+        <p>
+          Small scroll movements are ignored by the hide and reveal deltas,
+          which avoids flicker when the browser reports tiny wheel changes.
+        </p>
+
+        <h2 id="notes">Notes</h2>
+        <p>
+          The same core can later support React, Vue, or Svelte wrappers
+          because it has no rendering opinions. Framework adapters only need
+          to own lifecycle and refs.
+        </p>
+      </article>
+    </main>
+
+    <script type="module">
+      import { createScrollHead } from "../dist/index.js";
+
+      createScrollHead(document.querySelector(".site-header"), {
+        behaviors: ["hide", "compact", "elevate"],
+        threshold: 96,
+        hideDelta: 18,
+        revealDelta: 8,
+        heights: {
+          full: 72,
+          compact: 54
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,26 @@
+.scroll-head {
+  --scroll-head-transition-duration: 180ms;
+  --scroll-head-transition-easing: ease;
+
+  height: var(--scroll-head-height, 72px);
+  transform: translateY(0);
+  transition:
+    height var(--scroll-head-transition-duration) var(--scroll-head-transition-easing),
+    transform var(--scroll-head-transition-duration) var(--scroll-head-transition-easing),
+    background-color var(--scroll-head-transition-duration) var(--scroll-head-transition-easing),
+    border-color var(--scroll-head-transition-duration) var(--scroll-head-transition-easing),
+    box-shadow var(--scroll-head-transition-duration) var(--scroll-head-transition-easing),
+    backdrop-filter var(--scroll-head-transition-duration) var(--scroll-head-transition-easing);
+  will-change: height, transform;
+}
+
+.scroll-head[data-scroll-head-state="hidden"],
+.scroll-head.scroll-head--hidden {
+  transform: translateY(-100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-head {
+    transition-duration: 1ms;
+  }
+}

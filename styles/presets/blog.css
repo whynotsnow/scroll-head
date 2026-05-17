@@ -1,0 +1,22 @@
+@import "../base.css";
+
+.scroll-head-blog {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+}
+
+.scroll-head-blog[data-scroll-head-edge="away"],
+.scroll-head-blog.scroll-head--away {
+  background: rgb(255 255 255 / 0.88);
+  border-bottom-color: rgb(20 28 34 / 0.1);
+  box-shadow: 0 12px 32px rgb(20 28 34 / 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.scroll-head-blog[data-scroll-head-edge="top"],
+.scroll-head-blog.scroll-head--top {
+  box-shadow: none;
+}
